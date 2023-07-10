@@ -5,7 +5,9 @@ const { v4: generateId } = require('uuid');
 const { NotFoundError } = require('../util/errors');
 
 async function readData() {
+  
   const data = await fs.readFile('events.json', 'utf8');
+  
   return JSON.parse(data);
 }
 
