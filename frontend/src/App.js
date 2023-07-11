@@ -39,22 +39,37 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <HomePage /> },
+      {
+        index: true,
+        element: <HomePage />
+      },
       {
         path: 'events',
         element: <EventsRootLayout />,
         children: [
           {
-            index: true, element: <EventsPage />,
+            index: true,
+            element: <EventsPage />,
             loader: loadredData
-
           },
           {
-            path: ':id', element: <EventDetailPage />,
-            loader: eventDetail
+            path: ':id',
+            id: "event-detail",
+            loader: eventDetail,
+            children: [
+              {
+                index: true,
+                element: <EventDetailPage />,
+              },
+              {
+                path: 'edit',
+                element: <EditEventPage />
+              }
+
+            ]
           },
           { path: 'new', element: <NewEventPage /> },
-          { path: ':id/edit', element: <EditEventPage /> }
+
         ]
       }
     ]

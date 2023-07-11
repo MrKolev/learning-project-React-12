@@ -5,11 +5,9 @@ import EventsList from '../components/EventsList';
 export function EventsPage() {
 
   const data = useLoaderData();
-
   // if(data.isError){
   // return<p>{ data.message}</p>
   // }
-
   return (
     <>
       <EventsList events={data.events} />
