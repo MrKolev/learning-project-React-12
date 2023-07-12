@@ -10,7 +10,7 @@ export const EventDetailPage = () => {
     )
 }
 
-export async function eventDetail({ request, params }) {
+export async function actionEventDetail({ request, params }) {
     const id = params.id;
     const response = await fetch('http://localhost:8080/events/' + id)
 
