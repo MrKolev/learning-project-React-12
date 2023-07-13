@@ -3,14 +3,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import classes from './EventForm.module.css';
 import { useState } from 'react';
 
-function EventForm({ event }) {
+export function EventForm({ event }) {
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
 
   function cancelHandler() {
-    navigate("..")
+    const proceed = window.confirm('Are you sure you want to Cancel');
+    if (proceed) {
+      navigate("..")
+    }
   }
 
   async function submitHandler(e) {
@@ -39,7 +42,7 @@ function EventForm({ event }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData)
       });
-      if(response.status === 422){
+      if (response.status === 422) {
         const data = await response.json()
         alert(data.message);
         throw new Error(response.message)
@@ -47,8 +50,8 @@ function EventForm({ event }) {
       const data = await response.json()
       const eventId = data.event.id;
 
-
       navigate(`/events/${eventId}`);
+
     } catch (error) {
       throw new Error(error);
     }
@@ -102,38 +105,4 @@ function EventForm({ event }) {
   );
 }
 
-export default EventForm;
 
-// export async function action(event) {
-//   const method = request.method;
-//   const data = await request.formData();
-
-//   const eventData = {
-//     title: data.get('title'),
-//     image: data.get('image'),
-//     date: data.get('date'),
-//     description: data.get('description')
-//   };
-
-//   let url = `http://localhost:8080/events`
-//   if (method === 'patch') {
-//     const id = params.id
-//     url += `/${id}`;
-//   }
-
-//   const response = await fetch(url, {
-//     method: method,
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify(eventData)
-//   });
-
-//   if (response.status === 422) {
-//     return response;
-//   }
-
-//   if (!response.ok) {
-//     throw json({ message: "Could not save event" }, { status: response.status })
-//   }
-
-//   return redirect('/events')
-// }
