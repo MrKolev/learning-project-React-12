@@ -1,25 +1,61 @@
-import { Form, json, redirect, useActionData, useNavigate, useNavigation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import classes from './EventForm.module.css';
+import { useState } from 'react';
 
-function EventForm({ method, event }) {
+function EventForm({ event }) {
 
-  const data = useActionData();
-
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { id } = useParams();
   const navigate = useNavigate();
-  const navigation = useNavigation();
-
-  const isSubmitted = navigation.state === 'submitting';
 
   function cancelHandler() {
-    navigate('..');
+    navigate("..")
+  }
+
+  async function submitHandler(e) {
+    e.preventDefault();
+    setIsSubmitted(true);
+    let url = `http://localhost:8080/events`
+    let method = 'POST'
+    const data = new FormData(e.target);
+
+    const eventData = {
+      title: data.get(`title`),
+      image: data.get(`image`),
+      date: data.get(`date`),
+      description: data.get(`description`)
+    }
+
+    if (event) {
+      url += `/${id}`;
+      method = "PATCH";
+
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData)
+      });
+      if(response.status === 422){
+        const data = await response.json()
+        alert(data.message);
+        throw new Error(response.message)
+      }
+      const data = await response.json()
+      const eventId = data.event.id;
+
+
+      navigate(`/events/${eventId}`);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   return (
-    <Form method={method} className={classes.form}>
-      {data && data.errors && <ul>
-        {Object.values(data.errors).map(err => <li key={err}>{err}</li>)}
-      </ul>}
+    <form onSubmit={submitHandler} className={classes.form}>
       <p>
         <label htmlFor="title">Title</label>
         <input
@@ -60,44 +96,44 @@ function EventForm({ method, event }) {
         <button type="button" onClick={cancelHandler} disabled={isSubmitted}>
           Cancel
         </button>
-        <button disabled={isSubmitted} >{isSubmitted ? 'Submitting...' : 'Save'}</button>
+        <button type="submit" disabled={isSubmitted} >{isSubmitted ? 'Submitting...' : 'Save'}</button>
       </div>
-    </Form>
+    </form>
   );
 }
 
 export default EventForm;
 
-export async function action({ request, params }) {
-  const method = request.method;
-  const data = await request.formData();
+// export async function action(event) {
+//   const method = request.method;
+//   const data = await request.formData();
 
-  const eventData = {
-    title: data.get('title'),
-    image: data.get('image'),
-    date: data.get('date'),
-    description: data.get('description')
-  };
+//   const eventData = {
+//     title: data.get('title'),
+//     image: data.get('image'),
+//     date: data.get('date'),
+//     description: data.get('description')
+//   };
 
-  let url = `http://localhost:8080/events`
-  if (method === 'patch') {
-    const id = params.id
-    url += `/${id}`;
-  }
+//   let url = `http://localhost:8080/events`
+//   if (method === 'patch') {
+//     const id = params.id
+//     url += `/${id}`;
+//   }
 
-  const response = await fetch(url, {
-    method: method,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(eventData)
-  });
+//   const response = await fetch(url, {
+//     method: method,
+//     headers: { 'Content-Type': 'application/json' },
+//     body: JSON.stringify(eventData)
+//   });
 
-  if (response.status === 422) {
-    return response;
-  }
+//   if (response.status === 422) {
+//     return response;
+//   }
 
-  if (!response.ok) {
-    throw json({ message: "Could not save event" }, { status: response.status })
-  }
+//   if (!response.ok) {
+//     throw json({ message: "Could not save event" }, { status: response.status })
+//   }
 
-  return redirect('/events')
-}
+//   return redirect('/events')
+// }

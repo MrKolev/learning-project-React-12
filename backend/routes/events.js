@@ -12,9 +12,8 @@ const router = express.Router();
 router.get('/', async (req, res, next) => {
   try {
     const events = await getAll();
-    setTimeout(() => {
       res.json({ events: events })
-    },0)
+   
   } catch (error) {
     next(error);
   }
@@ -58,8 +57,8 @@ router.post('/', async (req, res, next) => {
   }
 
   try {
-    await add(data);
-    res.status(201).json({ message: 'Event saved.', event: data });
+   const newData = await add(data);
+    res.status(201).json({ message: 'Event saved.', event: newData });
   } catch (error) {
     next(error);
   }
@@ -67,7 +66,6 @@ router.post('/', async (req, res, next) => {
 
 router.patch('/:id', async (req, res, next) => {
   const data = req.body;
-
   let errors = {};
 
   if (!isValidText(data.title)) {

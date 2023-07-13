@@ -1,7 +1,29 @@
-import { useRouteLoaderData } from "react-router-dom"
+import { useParams } from "react-router-dom";
 import EventForm from "../components/EventForm"
+import { useEffect, useState } from "react";
 
 export const EditEventPage = () => {
-   const data = useRouteLoaderData("event-detail");
-    return <EventForm method={"patch"} event={data.event} />
+    const { id } = useParams();
+    const [event, setEvent] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        (async function () {
+            try {
+                const response = await fetch('http://localhost:8080/events/' + id);
+                const data = await response.json();
+                setEvent(data.event)
+            } catch (error) {
+                throw new Error(error);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []);
+
+    return <>
+        {loading && <h1>Loading...</h1>}
+        {!loading && <EventForm event={event} />}
+    </>
 }
