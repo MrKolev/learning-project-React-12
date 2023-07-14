@@ -92,8 +92,9 @@ router.patch('/:id', async (req, res, next) => {
   }
 
   try {
-    await replace(req.params.id, data);
-    res.json({ message: 'Event updated.', event: data });
+    const id = req.params.id
+    await replace(id, data);
+    res.json({ message: 'Event updated.', event: {...data, id } });
   } catch (error) {
     next(error);
   }
